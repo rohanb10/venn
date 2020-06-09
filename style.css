@@ -1,0 +1,35 @@
+body {
+	margin: 0;
+	font-family: sans-serif;
+}
+.grid {
+	height: 80vh;
+}
+.controls {
+	margin: 0 auto;
+	/*text-align: center;*/
+}
+input {
+	/*display: block;*/
+	width: 40%;
+	font-size: 1em;
+
+	outline: none;
+	border: none;
+	
+	border-bottom: 2px solid black;
+	box-sizing: border-box;
+	text-align: center;
+}
+label {
+	min-width: 50%;
+	display: inline-block;
+	/*display: block;*/
+	/*text-align: center;*/
+	padding-top: 1em
+}
+.control-group {
+	font-size: 1.25em;
+	padding-bottom: 1em
+	/*display: block;*/
+}
