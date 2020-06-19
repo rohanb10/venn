@@ -1,5 +1,5 @@
 const LETTERS = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-var circles = [], sets = [], number_of_circles = 8;
+var circles = [], sets = [], number_of_circles = 2;
 
 function getCircleNames(number) {
 	var a = []
@@ -8,8 +8,34 @@ function getCircleNames(number) {
 	}
 	return a;
 }
+// var circles = Array.from(Array(number_of_circles).keys());
 
-circles = getCircleNames(number_of_circles)
+circles = getCircleNames(number_of_circles);
+
+function addCircle() {
+	if (number_of_circles + 1 > 5) return;
+	circles = getCircleNames(number_of_circles + 1);
+	var new_areas = getAllCombinations(circles);
+	var diff = []
+	for (var i = 0; i < new_areas.length; i++) {
+		var isDupe = current_areas.find(el =>  isEqualArray(new_areas[i], el));
+		if (!isDupe) diff.push(new_areas[i]);
+	}
+	console.log(current_areas.concat(diff));
+	buildSets(diff);
+	// current_areas.concat(diff)
+	// sets = buildSets(current_areas.concat(diff));
+	console.log(sets);
+	d3.select("#venn").datum(sets).call(chart);
+	number_of_circles++;
+	buildControls();
+}
+
+function removeCircle() {
+	var circleToRemove = LETTERS.charAt(number_of_circles);
+	console.log(circleToRemove);
+	// sets.forEach()
+}
 
 function getAllCombinations(arr) {
 	if (arr.length === 1) return [arr];
@@ -18,42 +44,51 @@ function getAllCombinations(arr) {
 		return subarr.concat(subarr.map(e => e.concat(arr[0])), [[arr[0]]]);
 	}
 }
-var areas = getAllCombinations(circles)
-for (var i = 0; i < areas.length; i++) {
-	sets.push({
-		sets: areas[i].sort(),
-		// label: areas[i].sort().join(''),
-		size: areas[i].length === 1 ? 9 : areas[i].length
-	});
+var current_areas = getAllCombinations(circles)
+
+``
+function buildSets(areas) {
+	for (var i = 0; i < areas.length; i++) {
+		sets.push({
+			sets: areas[i].sort(),
+			label: areas[i].sort().join(''),
+			size: areas[i].length === 1 ? 9 : 0
+		});
+	}	
 }
+buildSets(current_areas);
 
 var chart = venn.VennDiagram();
 d3.select("#venn").datum(sets).call(chart);
 
 var control_panel = document.querySelector('.controls')
-
-areas.sort().forEach(i => {
-	var div = Object.assign(document.createElement('div'), {
-		className: 'control-group'
+function buildControls() {
+	control_panel.innerHTML = "";
+	sets.sort().forEach(i => {
+		console.log(i);
+		var div = Object.assign(document.createElement('div'), {
+			className: 'control-group'
+		});
+		var input = Object.assign(document.createElement('input'), {
+			type: 'number',
+			min: 0,
+			max: 14,
+			id: `area-${i.sets.join('')}`,
+			value: i.size
+		});
+		input.onchange = () => {
+			updateValue(input.value, input.id.substr(input.id.indexOf('-')+1).split(''));
+		}
+		var label = Object.assign(document.createElement('label'), {
+			for: `area-${i.sets.join('')}`,
+			innerHTML: i.sets.join('&nbsp;&#8745;&nbsp;')
+		});
+		div.append(label);
+		div.append(input);
+		control_panel.append(div);
 	});
-	var input = Object.assign(document.createElement('input'), {
-		type: 'number',
-		min: 0,
-		max: 14,
-		id: `area-${i.join('')}`,
-		value: i.length === 1 ? 9 : i.length
-	});
-	input.onchange = () => {
-		updateValue(input.value, input.id.substr(input.id.indexOf('-')+1).split(''));
-	}
-	var label = Object.assign(document.createElement('label'), {
-		for: `area-${i.join('')}`,
-		innerHTML: i.join('&nbsp;&#8745;&nbsp;')
-	});
-	div.append(label);
-	div.append(input);
-	control_panel.append(div);
-});
+}
+buildControls();
 
 function isEqualArray(a, b) {
 	if (a === b) return true;
@@ -65,7 +100,6 @@ function isEqualArray(a, b) {
 		if (a[i] !== b[i]) return false;
 	}
 	return true;
-
 }
 
 function updateValue(value, area) {
@@ -73,6 +107,7 @@ function updateValue(value, area) {
 	if (typeof area === 'string' && area.length == 1) area = [area.toUpperCase()];
 	for (var i = 0; i < sets.length; i++) {
 		if (isEqualArray(sets[i].sets, area)) {
+			if (sets[i].sets.length > 1) 
 			sets[i].size = parseInt(value);
 		}
 	}
